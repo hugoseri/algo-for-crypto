@@ -11,16 +11,16 @@ public class Main {
         // ---- testing modular_add carry ----
         BigNumber A = new BigNumber(prime_number, 7);
         A.showValue();
-        BigNumber B = new BigNumber(1, 7);
+        BigNumber B = new BigNumber(prime_number, 7);
         B.showValue();
 
 
         // ---- showing A, B and N values ----
-//        long A_bis = A.arrayToString();
-//        System.out.println("A = " + A_bis);
-//        long B_bis = B.arrayToString();
-//        System.out.println("B = " + B_bis);
-//        long modulo_bis = modulo.arrayToString();
+        long A_bis = A.arrayToString();
+        System.out.println("A = " + A_bis);
+        long B_bis = B.arrayToString();
+        System.out.println("B = " + B_bis);
+        long modulo_bis = modulo.arrayToString();
 //        System.out.println("N = " + modulo_bis);
 
 
@@ -29,10 +29,11 @@ public class Main {
 //        System.out.println("(diy) A - B = " + A.arrayToString());
 //        System.out.println("(java) A - B = " + (A_bis - B_bis));
 
-
-        A.modular_add(B, modulo);
+        A.modular_sub(B, modulo);
         A.showValue();
 
+        // BigNumber result_mult = A.modular_mult(B, modulo);
+        // result_mult.showValue();
 
         System.out.println("(diy) A - B = " + A.arrayToString());
         // System.out.println("(java) A - B = " + (A_bis - B_bis) % modulo_bis);
