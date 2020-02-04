@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class BigNumber {
 
-    public static final int TWO_POW_31 = 0x80000000;
+    public static final long TWO_POW_31 = 0x80000000L;
 
     private int size = 8;
     private int[] value; // [0] : MSB ; [size - 1] : LSB
@@ -20,16 +20,6 @@ public class BigNumber {
         if (random){
             randomValue(maxWordValue);
         }
-    }
-
-    /**
-     * Constructor for generic BigNumber object with random numbers inside specific interval.
-     * @param minWordValue : if random is true, min limit for random word values
-     * @param maxWordValue : if random is true, max limit for random word values
-     */
-    public BigNumber(int minWordValue, int maxWordValue){
-        value = new int[this.size];
-        randomValue(minWordValue, maxWordValue);
     }
 
     /**
@@ -50,10 +40,22 @@ public class BigNumber {
     /**
      * Constructor for BigNumber object used for modulo.
      * @param prime_nb : value of the modulo (32 bit)
+     * @param n : index of not null word (that equals prime_nb)
      */
-    public BigNumber(int prime_nb){
+    public BigNumber(int prime_nb, int n){
         value = new int[this.size];
-        value[0] = prime_nb;
+        value[n] = prime_nb;
+    }
+
+    /**
+     * Constructor for BigNumber object that equals 1.
+     * @param one : must be "1" to have a BigNumber value of 1
+     */
+    public BigNumber(String one){
+        value = new int[this.size];
+        if (one.equals("1")) {
+            value[this.size - 1] = 1;
+        }
     }
 
     /**
@@ -117,7 +119,7 @@ public class BigNumber {
     public long arrayToString(){
         long returned = 0;
         for (int i=0; i < this.size; i++){
-            returned += this.value[this.size - 1 - i] * Math.pow(2, 32*i);
+            returned += this.value[this.size - 1 - i] * Math.pow(2, 31*i);
         }
         return returned;
     }
@@ -130,15 +132,23 @@ public class BigNumber {
     public void modular_add(BigNumber B, BigNumber modulo){
         BigNumber result = new BigNumber(false, 0);
         System.arraycopy(this.value, 0, result.value, 0, this.size);
-        long carry = result.add_by_word(B);
-        if (result.sup(modulo) || carry > 0){
+        result.add_by_word(B);
+        if (result.sup(modulo)){
             result.sub_by_word(modulo);
         }
         this.value = result.value;
     }
 
-    public void modular_sub(BigNumber B){
-
+    public void modular_sub(BigNumber B, BigNumber modulo){
+        BigNumber result = new BigNumber(false, 0);
+        System.arraycopy(this.value, 0, result.value, 0, this.size);
+        if (this.sup(B)){
+            result.sub_by_word(B);
+        } else {
+            result.add_by_word(modulo);
+            result.sub_by_word(B);
+        }
+        this.value = result.value;
     }
 
     /**
@@ -178,7 +188,7 @@ public class BigNumber {
             while (k >= 0) {
                 if (this.value[k] > B.value[k]) {
                     result[k] += this.value[k] - B.value[k];
-                } else {
+                } else if (this.value[k] != 0 || B.value[k] != 0 || result[k] != 0){
                     result[k] += (int) (this.value[k] + TWO_POW_31 - B.value[k]);
                     if (k > 0) {
                         result[k - 1] -= 1;
@@ -197,7 +207,7 @@ public class BigNumber {
      * @param B
      * @return carry between each MSB
      */
-    private long add_by_word(BigNumber B){
+    private void add_by_word(BigNumber B){
         if (B.size == this.size) {
             BigNumber result = new BigNumber(false, 0);
             // long mask_retenue = 0xFFFF0000L;
@@ -205,7 +215,8 @@ public class BigNumber {
             long carry = 0;
             for (int i=this.size - 1; i>=0; i--) {
                 long ai_plus_bi = (long) this.value[i] + B.value[i] + result.value[i];
-                result.value[i] = (int) ai_plus_bi & 0xFFFFFFF;
+                long temp = ai_plus_bi & 0x7fffffff;
+                result.value[i] = (int) temp;
                 carry = ai_plus_bi >> 31;
                 if (i > 0) {
                     result.value[i - 1] = (int) carry;
@@ -214,10 +225,8 @@ public class BigNumber {
                 }
             }
             this.value = result.value;
-            return carry;
         } else {
             System.out.println("Error: Input has different size than current BigNumber.");
-            return -1;
         }
     }
 }
