@@ -335,7 +335,8 @@ public class BigNumber {
                 temp.value[double_size - 1 - ai - bi] = (int) ((int) mult & FILTER_32_BIT);
                 long temp_carry = mult >> 31;
                 temp.value[double_size - 2 - ai - bi] = (int) temp_carry;
-                result.modular_add(temp, modulo_double);
+                //result.modular_add(temp, modulo_double);
+                result.add_by_word(temp);
 
             }
         }

@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
 
         int prime_number = 17;
-        BigNumber modulo = new BigNumber(prime_number, 0);
+        BigNumber modulo = new BigNumber(prime_number, 3);
         modulo.showValue();
 
         // ---- testing modular_add carry ----
