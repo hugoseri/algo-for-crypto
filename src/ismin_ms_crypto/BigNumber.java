@@ -1,5 +1,6 @@
 package ismin_ms_crypto;
 
+import java.math.BigInteger;
 import java.util.Random;
 
 public class BigNumber {
@@ -128,15 +129,15 @@ public class BigNumber {
     }
 
     /**
-     * Function returning a long from value parameter array.
-     * @return long
+     * Function returning a BigInteger from value parameter array.
+     * @return
      */
-    public long arrayToString(){
-        long returned = 0;
+    public BigInteger toBigInteger(){
+        String binary_string = "";
         for (int i=0; i < this.size; i++){
-            returned += this.value[this.size - 1 - i] * Math.pow(2, 31*i);
+            binary_string += String.format("%31s", Integer.toBinaryString(this.value[i])).replace(' ', '0');
         }
-        return returned;
+        return new BigInteger(binary_string, 2);
     }
 
     /**
@@ -152,6 +153,15 @@ public class BigNumber {
             result.sub_by_word(modulo);
         }
         this.value = result.value;
+    }
+
+    /**
+     * Function computing modular addition using Java BigIntegers.
+     * @param B BigNumber to add
+     * @param modulo modulo value
+     */
+    public BigInteger modular_add_java(BigNumber B, BigNumber modulo){
+        return this.toBigInteger().add(B.toBigInteger()).mod(modulo.toBigInteger());
     }
 
     /**
@@ -172,28 +182,14 @@ public class BigNumber {
     }
 
     /**
-     * Function computing modular multiplication.
+     * Function computing modular substraction using Java BigIntegers.
      * @param B BigNumber to substract
      * @param modulo modulo value
      */
-    public BigNumber modular_mult(BigNumber B, BigNumber modulo){
-        int double_size = this.size * 2;
-        BigNumber modulo_double = new BigNumber(double_size);
-        System.arraycopy(modulo.value, 0, modulo_double.value, this.size, this.size);
-        BigNumber result = new BigNumber(double_size);
-        for (int ai=0; ai<this.size; ai++){
-            for (int bi=0; bi<this.size; bi++){
-                long mult = (long) this.value[this.size - 1 - ai] * B.value[this.size - 1 - bi];
-                BigNumber temp = new BigNumber(double_size);
-                temp.value[double_size - 1 - ai - bi] = (int) ((int) mult & FILTER_32_BIT);
-                long temp_carry = mult >> 31;
-                temp.value[double_size - 2 - ai - bi] = (int) temp_carry;
-                result.modular_add(temp, modulo_double);
-
-            }
-        }
-        return result;
+    public BigInteger modular_sub_java(BigNumber B, BigNumber modulo){
+        return this.toBigInteger().subtract(B.toBigInteger()).mod(modulo.toBigInteger());
     }
+
 
     /**
      * Function implementing >= operator for BigNumber objects.
@@ -319,5 +315,38 @@ public class BigNumber {
         } else {
             System.out.println("[Add_by_word] Error: Input has different size than current BigNumber.");
         }
+    }
+
+
+    /**
+     * Function computing multiplication.
+     * @param B BigNumber to substract
+     * @param modulo modulo value
+     */
+    public BigNumber mult_by_word(BigNumber B, BigNumber modulo){
+        int double_size = this.size * 2;
+        BigNumber modulo_double = new BigNumber(double_size);
+        System.arraycopy(modulo.value, 0, modulo_double.value, this.size, this.size);
+        BigNumber result = new BigNumber(double_size);
+        for (int ai=0; ai<this.size; ai++){
+            for (int bi=0; bi<this.size; bi++){
+                long mult = (long) this.value[this.size - 1 - ai] * B.value[this.size - 1 - bi];
+                BigNumber temp = new BigNumber(double_size);
+                temp.value[double_size - 1 - ai - bi] = (int) ((int) mult & FILTER_32_BIT);
+                long temp_carry = mult >> 31;
+                temp.value[double_size - 2 - ai - bi] = (int) temp_carry;
+                result.modular_add(temp, modulo_double);
+
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Function computing multiplication using java BigIntegers.
+     * @param B BigNumber to multiply
+     */
+    public BigInteger mult_by_word_java(BigNumber B){
+        return this.toBigInteger().multiply(B.toBigInteger());
     }
 }
