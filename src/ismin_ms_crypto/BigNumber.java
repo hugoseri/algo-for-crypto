@@ -75,14 +75,6 @@ public class BigNumber {
     }
 
     /**
-     *
-     * @param modulo
-     */
-    private void compute_modulo_montgomery(BigNumber modulo){
-
-    }
-
-    /**
      * Function initializing BigNumber value by randoms.
      * @param maxValue : max random value
      */
@@ -188,6 +180,15 @@ public class BigNumber {
      */
     public BigInteger modular_sub_java(BigNumber B, BigNumber modulo){
         return this.toBigInteger().subtract(B.toBigInteger()).mod(modulo.toBigInteger());
+    }
+
+    public BigNumber montgomery_algo(BigNumber A, BigNumber B, BigNumber modulo, BigNumber r, BigNumber v, int k){
+        BigNumber s = A.mult_by_word(B);
+        int double_size = this.size * 2;
+        BigNumber v_double = new BigNumber(double_size);
+        System.arraycopy(v.value, 0, v_double.value, this.size, this.size);
+        BigNumber t = s.mult_by_word(v);
+        return t;
     }
 
 
@@ -321,12 +322,11 @@ public class BigNumber {
     /**
      * Function computing multiplication.
      * @param B BigNumber to substract
-     * @param modulo modulo value
      */
-    public BigNumber mult_by_word(BigNumber B, BigNumber modulo){
+    public BigNumber mult_by_word(BigNumber B){
         int double_size = this.size * 2;
-        BigNumber modulo_double = new BigNumber(double_size);
-        System.arraycopy(modulo.value, 0, modulo_double.value, this.size, this.size);
+        //BigNumber modulo_double = new BigNumber(double_size);
+        //System.arraycopy(modulo.value, 0, modulo_double.value, this.size, this.size);
         BigNumber result = new BigNumber(double_size);
         for (int ai=0; ai<this.size; ai++){
             for (int bi=0; bi<this.size; bi++){
@@ -349,5 +349,16 @@ public class BigNumber {
      */
     public BigInteger mult_by_word_java(BigNumber B){
         return this.toBigInteger().multiply(B.toBigInteger());
+    }
+
+    public void compute_modulo_r(int k){
+        int k_31 = k/31;
+        for (int i=0; i < this.size - 1 - k_31; i++){
+            this.value[i] = 0;
+        }
+        for (int i=0; i<=k_31; i++){
+            int pow = k - i*k_31 < 32 ? k - k_31 : 31;
+            this.value[this.size - 1 - i] = this.value[this.size - 1 - i] & ((2 << pow-1) - 1);
+        }
     }
 }
