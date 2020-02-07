@@ -6,19 +6,56 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int prime_number = 39921;
+        int prime_number = 17;
         int r_montgomery = 32;
-        int r_1_montgomery = 8;
+        int k = 5;
+        int r2_montgomery = 1024;
         int v_montgomery = 15;
 
-        BigNumber A = new BigNumber(32, prime_number, 7);
+        BigNumber modulo = new BigNumber(prime_number, 7);
+        BigNumber r = new BigNumber(r_montgomery, 7);
+        BigNumber v = new BigNumber(v_montgomery, 7);
 
-        BigInteger A_div_r = A.divide_by_r_java(new BigNumber(64, 5));
-        String A_div_r_string = A_div_r.toString(2);
+        System.out.println("Hello");
 
-        System.out.println("java : " + A_div_r);
-        A.divide_by_r(68);
-        System.out.println("diy : " + A.toBigInteger());
+        BigNumber A = new BigNumber(8, 9, 1);
+        BigNumber B = new BigNumber(5, 6, 1);
+
+        // Testing modular multiplication
+        System.out.println("java : " + A.modular_mult_java(B, modulo));
+        BigNumber AxB = A.modular_mult(B, modulo, r, v, k);
+        System.out.println("diy : " + AxB.toBigInteger());
+//
+//        BigNumber M = new BigNumber(2);
+//        M.randomValue(6, 7);
+//        BigNumber N = new BigNumber(1);
+//        N.randomValue(9, 10);
+//        System.out.println(M.toBigInteger() + " > " + N.toBigInteger());
+//        System.out.println(M.sup(N));
+        //------------------------------------------
+        // ----- Testing divide by r function ------
+        //------------------------------------------
+//        BigNumber A = new BigNumber(1, 30000, 7);
+//        int k = 1; // just choose any k value, other parameters are calculated based on its value
+//        int k_rest_31 = k % 31;
+//        int k_x_31 = k / 31;
+//        BigNumber r_example = new BigNumber((int) Math.pow(2, k_rest_31), 7-k_x_31);
+//
+//        BigInteger A_div_r = A.divide_by_r_java(r_example);
+//
+//        System.out.println("java : " + A_div_r);
+//        A.divide_by_r(k);
+//        System.out.println("diy : " + A.toBigInteger());
+        //------------------------------------------
+        // ----- END Testing divide by r function -----
+        //------------------------------------------
+
+
+        // Testing modulo r
+
+//        System.out.println(A.modulo_n_java(modulo));
+//        A.compute_modulo_r(k);
+//        System.out.println(A.toBigInteger());
 
 //        BigNumber modulo = new BigNumber(prime_number, 3);
 //        modulo.showValue();
