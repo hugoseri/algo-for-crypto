@@ -142,7 +142,7 @@ public class BigNumber {
     }
 
     /**
-     * Function computing modular addition.
+     * Function computing modular addition (A and B must be less than modulo).
      *
      * @param B      BigNumber to add
      * @param modulo modulo value
@@ -168,7 +168,7 @@ public class BigNumber {
     }
 
     /**
-     * Function computing modular substraction.
+     * Function computing modular substraction (A and B must be less than modulo).
      *
      * @param B      BigNumber to substract
      * @param modulo modulo value
