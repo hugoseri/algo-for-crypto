@@ -11,13 +11,14 @@ public class Main {
         int r_1_montgomery = 8;
         int v_montgomery = 15;
 
-        BigNumber A = new BigNumber(0, prime_number, 7);
-        A.showValue();
-        A.compute_modulo_r(33);
-        A.showValue();
-        A.compute_modulo_r(1);
-        A.showValue();
+        BigNumber A = new BigNumber(32, prime_number, 7);
 
+        BigInteger A_div_r = A.divide_by_r_java(new BigNumber(64, 5));
+        String A_div_r_string = A_div_r.toString(2);
+
+        System.out.println("java : " + A_div_r);
+        A.divide_by_r(68);
+        System.out.println("diy : " + A.toBigInteger());
 
 //        BigNumber modulo = new BigNumber(prime_number, 3);
 //        modulo.showValue();

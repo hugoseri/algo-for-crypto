@@ -188,7 +188,10 @@ public class BigNumber {
         BigNumber v_double = new BigNumber(double_size);
         System.arraycopy(v.value, 0, v_double.value, this.size, this.size);
         BigNumber t = s.mult_by_word(v);
-        return t;
+        t.compute_modulo_r(k);
+        BigNumber t_x_n = t.mult_by_word(modulo);
+        s.add_by_word(t_x_n); // equals m
+        return s;
     }
 
 
@@ -351,14 +354,60 @@ public class BigNumber {
         return this.toBigInteger().multiply(B.toBigInteger());
     }
 
+    /**
+     * Function computing BigNumber modulo r (r = 2^k) in Montgomery algorithm.
+     * @param k : parameter such as r = 2^k
+     */
     public void compute_modulo_r(int k){
         int k_31 = k/31;
         for (int i=0; i < this.size - 1 - k_31; i++){
             this.value[i] = 0;
         }
         for (int i=0; i<=k_31; i++){
-            int pow = k - i*k_31 < 32 ? k - k_31 : 31;
+            int pow = k - i*31 < 32 ? k - i*31 : 31;
+
+            // keep 2^pow first LSB bits
             this.value[this.size - 1 - i] = this.value[this.size - 1 - i] & ((2 << pow-1) - 1);
         }
+    }
+
+    /**
+     * Function computing BigNumber modulo r (r = 2^k) in Montgomery algorithm using java BigIntegers.
+     * @param r : parameter from Montgomery algorithm
+     * @return result of BigNumber modulo r
+     */
+    public BigInteger compute_module_r_java(BigNumber r){
+        return this.toBigInteger().mod(r.toBigInteger());
+    }
+
+    /**
+     * Function computing BigNumber divided by r (r = 2^k) in Montgomery algorithm.
+     * @param k : parameter such as r = 2^k
+     */
+    public void divide_by_r(int k){
+        int k_31 = k/31;
+        int max_31_k = k > 31 ? 31 : k;
+        int k_31_rest = k % 31;
+        int max_31_k_rest = k_31_rest == 0 ? 31 : k_31_rest;
+        int temp = 0;
+        for (int i=this.size - 1; i>k_31; i--){
+            // keep 2^k_31_rest first LSB bits
+            if (i >= k_31 + 1) {
+                this.value[i] = this.value[i - k_31] >> k_31_rest;
+                temp = this.value[i - 1 - k_31] & ((2 << k_31_rest - 1) - 1);
+            } else {
+                temp = 0;
+                this.value[i] = 0;
+            }
+            int temp3 = (temp << 31 - k_31_rest);
+            this.value[i] = this.value[i] + (temp << 31 - k_31_rest);
+        }
+        for (int i=0; i<=k_31; i++){
+            this.value[i] = 0;
+        }
+    }
+
+    public BigInteger divide_by_r_java(BigNumber r){
+        return this.toBigInteger().divide(r.toBigInteger());
     }
 }
